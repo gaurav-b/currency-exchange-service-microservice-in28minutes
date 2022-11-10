@@ -15,7 +15,7 @@ public class CircuitBreakerController {
 	Logger logger = LoggerFactory.getLogger(CircuitBreakerController.class);
 	
 	@GetMapping("/sample-api")
-	@Retry(name="sample-api") // using default retry configuration for now
+	@Retry(name="sample-api", fallbackMethod = "hardcodedResponse") // using default retry configuration for now
 							// which will retry for 3 times after failure
 							// and if still failed then return the error
 	public String sampleApi() {
@@ -24,5 +24,11 @@ public class CircuitBreakerController {
 		ResponseEntity<String> forEntity = new RestTemplate().getForEntity("http://localhost:8080/some-dummy-url", 
 				String.class);
 		return forEntity.getBody();
+	}
+	
+	// a fallback method which works when we use a Throwable instance
+	// in it as parameter
+	public String hardcodedResponse(Exception ex) {
+		return "fallback-response";
 	}
 }
