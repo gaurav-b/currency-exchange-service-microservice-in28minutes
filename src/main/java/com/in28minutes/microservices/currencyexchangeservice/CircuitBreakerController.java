@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 
 @RestController
@@ -20,6 +22,9 @@ public class CircuitBreakerController {
 							// which will retry for 3 times after failure
 							// and if still failed then return the error
 	@CircuitBreaker(name="default", fallbackMethod = "hardcodedResponse")
+	@RateLimiter(name="default") // @RateLimiter to set a number of request only
+								// in the provided time period
+	@Bulkhead(name="default") // to allow only certain number of concurrent calls for this method
 	public String sampleApi() {
 		
 		logger.info("Sample Api call received");
